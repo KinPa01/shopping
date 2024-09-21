@@ -305,7 +305,7 @@ export default function Shop() {
                     <p>ส่วนลดทั้งหมด: {selectedCoupon === 'DISCOUNT100' ? `${discount.toFixed(2)} ฿` : `${discount} ฿`}</p>
                     <p>รวมทั้งสิน: {calculateFinalPrice()} ฿</p>
                     <button
-                      onClick={() => alert('ขอบคุณที่ใช้บริการ ชำระเงินเสร็จสิ้น')}
+                      onClick={() => alert('ชำระเงินเสร็จสิ้น ขอบคุณที่ใช้บริการ ')}
                       style={{
                         padding: '10px 20px',
                         backgroundColor: 'blue',
