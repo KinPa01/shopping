@@ -7,7 +7,7 @@ export default function Shop() {
   const [isDropdownVisible, setDropdownVisible] = useState(false);
   const [selectedCoupon, setSelectedCoupon] = useState('');
   const [discount, setDiscount] = useState(0);
-  const [selectedCategory, setSelectedCategory] = useState(''); // หมวดหมู่ที่เลือก
+  const [selectedCategory, setSelectedCategory] = useState('');
 
   const categories = [
     'All',
@@ -21,10 +21,10 @@ export default function Shop() {
   ];
 
   const coupons = [
-    { code: 'DISCOUNT10', label: '10 ฿ Off', value: 10, type: 'fixed' },
-    { code: 'DISCOUNT20', label: '20 ฿ Off', value: 20, type: 'fixed' },
-    { code: 'DISCOUNT50', label: '50 ฿ Off', value: 50, type: 'fixed' },
-    { code: 'DISCOUNT100', label: '10% Off', value: 10, type: 'percentage' }, // ลด 10% แทน
+    { code: 'DISCOUNT10', label: 'ลด 10 ฿', value: 10, type: 'fixed' },
+    { code: 'DISCOUNT20', label: 'ลด 20 ฿', value: 20, type: 'fixed' },
+    { code: 'DISCOUNT50', label: 'ลด 50 ฿', value: 50, type: 'fixed' },
+    { code: 'DISCOUNT100', label: 'ลด 10%', value: 10, type: 'percentage' },
   ];
 
   function addTocard(product) {
@@ -70,18 +70,11 @@ export default function Shop() {
     const total = calculateTotalPrice();
     const shippingCost = 100;
 
-    let finalDiscount = 0;
+    let finalDiscount = discount;
 
-    // คำนวณส่วนลด
-    if (selectedCoupon) {
-      const coupon = coupons.find(c => c.code === selectedCoupon);
-      if (coupon) {
-        if (coupon.type === 'percentage') {
-          finalDiscount = (coupon.value / 100) * total; // ลดเป็นเปอร์เซ็นต์
-        } else if (coupon.type === 'fixed') {
-          finalDiscount = coupon.value; // ลดเป็นจำนวนเงินคงที่
-        }
-      }
+    // คำนวณส่วนลดจากคูปอง 10%
+    if (selectedCoupon === 'DISCOUNT100') {
+      finalDiscount = (10 / 100) * total; // คำนวณเป็น 10% ของยอดรวม
     }
 
     const finalPrice = total + shippingCost - finalDiscount;
@@ -94,7 +87,12 @@ export default function Shop() {
 
     if (coupon) {
       setSelectedCoupon(coupon.code);
-      setDiscount(coupon.value);
+      if (coupon.type === 'percentage') {
+        const total = calculateTotalPrice();
+        setDiscount((coupon.value / 100) * total); // คำนวณส่วนลดเป็นเปอร์เซ็นต์
+      } else {
+        setDiscount(coupon.value); // ส่วนลดจำนวนเงินคงที่
+      }
     } else {
       setSelectedCoupon('');
       setDiscount(0);
@@ -114,13 +112,13 @@ export default function Shop() {
     <li
       key={product.id}
       className="container"
-      onClick={() => addTocard(product)} // เพิ่ม onClick ให้ทั้งกรอบสินค้า
+      onClick={() => addTocard(product)}
       style={{
-        cursor: 'pointer', // เปลี่ยนเมาส์เป็น pointer เพื่อบอกว่าคลิกได้
+        cursor: 'pointer',
         border: '1px solid #ddd',
         padding: '10px',
         textAlign: 'center',
-        width: '200px', // กำหนดขนาดกรอบสินค้า
+        width: '200px',
         margin: '10px',
       }}
     >
@@ -133,7 +131,7 @@ export default function Shop() {
         <b>{product.name}:</b> {product.profession}
       </p>
       <p>{product.accomplishment}</p>
-      <p>Price: {product.price} ฿</p>
+      <p>ราคา: {product.price} ฿</p>
     </li>
   ));
 
@@ -149,7 +147,7 @@ export default function Shop() {
           boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
         }}
       >
-        <h1>My Shopping</h1>
+        <h1>GOGO My Shopping</h1>
         <nav
           style={{
             display: 'flex',
@@ -205,7 +203,7 @@ export default function Shop() {
                           <div>
                             <p style={{ margin: '0' }}>{product.name}</p>
                             <p style={{ margin: '0', fontSize: '12px' }}>
-                              Price: {product.price} ฿ | Total: {product.price * product.quantity} ฿
+                              ราคารวม: {product.price * product.quantity} ฿
                             </p>
                           </div>
                           <div
@@ -257,13 +255,13 @@ export default function Shop() {
                                 fontSize: '14px',
                               }}
                             >
-                              Remove
+                              ลบสินค้า
                             </button>
                           </div>
                         </li>
                       ))}
                     </ul>
-                    <p>Total Price: {calculateTotalPrice()} ฿</p>
+                    <p>ราคารวม: {calculateTotalPrice()} ฿</p>
 
                     <div
                       style={{
@@ -282,7 +280,7 @@ export default function Shop() {
                           borderRadius: '5px',
                         }}
                       >
-                        <option value="">Select a coupon</option>
+                        <option value="">เลือก คูปองส่วนลด</option>
                         {coupons.map(coupon => (
                           <option key={coupon.code} value={coupon.code}>
                             {coupon.label}
@@ -290,7 +288,7 @@ export default function Shop() {
                         ))}
                       </select>
                       <button
-                        onClick={() => alert(`Coupon ${selectedCoupon} applied!`)}
+                        onClick={() => alert(`คูปอง ${selectedCoupon} ถูกใช้งาน!`)}
                         style={{
                           padding: '8px 16px',
                           backgroundColor: 'green',
@@ -300,14 +298,14 @@ export default function Shop() {
                           cursor: 'pointer',
                         }}
                       >
-                        Apply Coupon
+                        เลือก คูปอง
                       </button>
                     </div>
-                    <p>Shipping: 100 ฿</p> {/* แสดงค่าขนส่ง */}
-                    <p>Discount: {discount} ฿</p>
-                    <p>Final Price: {calculateFinalPrice()} ฿</p> {/* คำนวณราคาสุดท้าย */}
+                    <p>ค่าจัดส่ง: 100 ฿</p>
+                    <p>ส่วนลดทั้งหมด: {selectedCoupon === 'DISCOUNT100' ? `${discount.toFixed(2)} ฿` : `${discount} ฿`}</p>
+                    <p>รวมทั้งสิน: {calculateFinalPrice()} ฿</p>
                     <button
-                      onClick={() => alert('Proceeding to Checkout')}
+                      onClick={() => alert('ขอบคุณที่ใช้บริการ ชำระเงินเสร็จสิ้น')}
                       style={{
                         padding: '10px 20px',
                         backgroundColor: 'blue',
@@ -317,7 +315,7 @@ export default function Shop() {
                         cursor: 'pointer',
                       }}
                     >
-                      Checkout
+                      ชำระเงิน
                     </button>
                   </div>
                 )}
@@ -361,7 +359,7 @@ export default function Shop() {
         </ul>
       </section>
       <footer>
-        <p>© 2024 My Shopping</p>
+        <p>© 2024 GOGO MY Shopping</p>
       </footer>
     </div>
   );
